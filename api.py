@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+import os
 
 app = Flask(__name__)
 CORS(app)
@@ -18,9 +19,8 @@ class User(db.Model):
     expenses = db.Column(db.JSON, default=[])
     goals = db.Column(db.JSON, default=[])
     achieved_goals = db.Column(db.JSON, default=[])
-    monthly_report = db.Column(db.JSON, default=[])  # 🔹 Ahora es un array vacío por defecto
+    monthly_report = db.Column(db.JSON, default=[])  
 
-#Conseguir todos los usuarios y sus datos
 @app.route('/users', methods=['GET'])
 def get_users():
     users = User.query.all()
@@ -61,12 +61,10 @@ def delete_user(user_id):
     db.session.commit()
     return jsonify({'message': 'User deleted successfully'}), 200
 
-#Eliminar todos los datos financieros de un usuario
 @app.route('/users/<int:user_id>/clear_data', methods=['DELETE'])
 def clear_user_data(user_id):
     user = User.query.get_or_404(user_id)
 
-    # Limpiar los datos financieros
     user.incomes = []
     user.expenses = []
     user.goals = []
@@ -83,11 +81,10 @@ def get_incomes(user_id):
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    # 🔹 Asegura que amount tenga siempre 2 decimales al responder
     formatted_incomes = [
         {
             **income,
-            "amount": float(f"{income['amount']:.2f}")  # 🔹 Forzar 2 decimales en la respuesta
+            "amount": float(f"{income['amount']:.2f}")  
         }
         for income in user.incomes
     ]
@@ -97,7 +94,7 @@ def get_incomes(user_id):
 #Agregar nuevo ingreso
 @app.route('/users/<int:user_id>/incomes', methods=['POST'])
 def add_income(user_id):
-    from copy import deepcopy  # 🔹 Importamos deepcopy para clonar la lista
+    from copy import deepcopy  
 
     user = User.query.get(user_id)
     if not user:
@@ -115,11 +112,9 @@ def add_income(user_id):
         "provenance": data['provenance']
     }
 
-    # 🔹 Clonamos la lista antes de modificarla
     incomes = deepcopy(user.incomes) if user.incomes else []
     incomes.append(new_income)
 
-    # 🔹 Reasignamos la lista modificada para que SQLAlchemy detecte cambios
     user.incomes = incomes
     db.session.commit()
 
@@ -132,11 +127,10 @@ def get_expenses(user_id):
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    # 🔹 Asegura que amount tenga siempre 2 decimales al responder
     formatted_expenses = [
         {
             **expense,
-            "amount": float(f"{expense['amount']:.2f}")  # 🔹 Forzar 2 decimales en la respuesta
+            "amount": float(f"{expense['amount']:.2f}")  
         }
         for expense in user.expenses
     ]
@@ -146,7 +140,7 @@ def get_expenses(user_id):
 #Agregar nuevo gasto
 @app.route('/users/<int:user_id>/expenses', methods=['POST'])
 def add_expense(user_id):
-    from copy import deepcopy  # 🔹 Importamos deepcopy para clonar la lista
+    from copy import deepcopy  # Importamos deepcopy para clonar la lista
 
     user = User.query.get(user_id)
     if not user:
@@ -164,11 +158,11 @@ def add_expense(user_id):
         "purpose": data['purpose']
     }
 
-    # 🔹 Clonamos la lista antes de modificarla
+    # Clonamos la lista antes de modificarla
     expenses = deepcopy(user.expenses) if user.expenses else []
     expenses.append(new_expense)
 
-    # 🔹 Reasignamos la lista modificada para que SQLAlchemy detecte cambios
+    # Reasignamos la lista modificada para que SQLAlchemy detecte cambios
     user.expenses = expenses
     db.session.commit()
 
@@ -256,7 +250,7 @@ def delete_achieved_goal(user_id, goal_index):
 #Ruta para obtener el reporte mensual
 @app.route('/users/<int:user_id>/monthly_report', methods=['POST'])
 def add_monthly_report(user_id):
-    from copy import deepcopy  # 🔹 Importamos deepcopy para clonar la lista
+    from copy import deepcopy  # Importamos deepcopy para clonar la lista
 
     user = User.query.get_or_404(user_id)
     data = request.get_json()
@@ -277,5 +271,10 @@ def add_monthly_report(user_id):
     return jsonify({'message': 'Monthly report added successfully', 'report': data}), 201
 
 
-if __name__ == '__main__':
-    app.run(debug=True) 
+@app.route("/")
+def home():
+    return "Hello, Render!"
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))  # Usa el puerto de Render o 5000 por defecto
+    app.run(host="0.0.0.0", port=port)
