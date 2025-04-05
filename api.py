@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Usar variable de entorno para la base de datos
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('postgresql://postgres:ZFypiYieLAuQTPyVKxkUCZfTMOumSoyu@switchyard.proxy.rlwy.net:54569/railway')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
