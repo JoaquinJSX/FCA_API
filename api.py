@@ -5,7 +5,7 @@ import os
 
 app = Flask(__name__)
 CORS(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///myfinances.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:ZFypiYieLAuQTPyVKxkUCZfTMOumSoyu@switchyard.proxy.rlwy.net:54569/railway'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -270,6 +270,8 @@ def add_monthly_report(user_id):
 
     return jsonify({'message': 'Monthly report added successfully', 'report': data}), 201
 
+with app.app_context():
+    db.create_all()
 
 @app.route("/")
 def home():
