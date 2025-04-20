@@ -24,7 +24,7 @@ class User(db.Model):
     achieved_goals = db.Column(db.JSON, default=[])
     monthly_report = db.Column(db.JSON, default=[])
 
-@app.route('/users', methods=['GET'])
+@app.route('/', methods=['GET'])
 def get_users():
     users = User.query.all()
     return jsonify([
@@ -41,7 +41,7 @@ def get_users():
         for user in users
     ])
 
-@app.route('/users', methods=['POST'])
+@app.route('/', methods=['POST'])
 def add_user():
     data = request.get_json()
     new_user = User(
@@ -57,14 +57,14 @@ def add_user():
     db.session.commit()
     return jsonify({'message': 'User added successfully', 'id': new_user.id}), 201
 
-@app.route('/users/<int:user_id>', methods=['DELETE'])
+@app.route('/<int:user_id>', methods=['DELETE'])
 def delete_user(user_id):
     user = User.query.get_or_404(user_id)
     db.session.delete(user)
     db.session.commit()
     return jsonify({'message': 'User deleted successfully'}), 200
 
-@app.route('/users/<int:user_id>/clear_data', methods=['DELETE'])
+@app.route('/<int:user_id>/clear_data', methods=['DELETE'])
 def clear_user_data(user_id):
     user = User.query.get_or_404(user_id)
     user.incomes = []
@@ -74,7 +74,7 @@ def clear_user_data(user_id):
     db.session.commit()
     return jsonify({'message': 'Financial data cleared successfully'}), 200
 
-@app.route('/users/<int:user_id>/incomes', methods=['GET'])
+@app.route('/<int:user_id>/incomes', methods=['GET'])
 def get_incomes(user_id):
     user = User.query.get(user_id)
     if not user:
@@ -88,7 +88,7 @@ def get_incomes(user_id):
     ]
     return jsonify(formatted_incomes)
 
-@app.route('/users/<int:user_id>/incomes', methods=['POST'])
+@app.route('/<int:user_id>/incomes', methods=['POST'])
 def add_income(user_id):
     user = User.query.get(user_id)
     if not user:
@@ -107,7 +107,7 @@ def add_income(user_id):
     db.session.commit()
     return jsonify(new_income), 201
 
-@app.route('/users/<int:user_id>/expenses', methods=['GET'])
+@app.route('/<int:user_id>/expenses', methods=['GET'])
 def get_expenses(user_id):
     user = User.query.get(user_id)
     if not user:
@@ -121,7 +121,7 @@ def get_expenses(user_id):
     ]
     return jsonify(formatted_expenses)
 
-@app.route('/users/<int:user_id>/expenses', methods=['POST'])
+@app.route('/<int:user_id>/expenses', methods=['POST'])
 def add_expense(user_id):
     user = User.query.get(user_id)
     if not user:
@@ -140,7 +140,7 @@ def add_expense(user_id):
     db.session.commit()
     return jsonify(new_expense), 201
 
-@app.route('/users/<int:user_id>/goals', methods=['POST'])
+@app.route('/<int:user_id>/goals', methods=['POST'])
 def add_goal(user_id):
     data = request.get_json()
     user = User.query.get_or_404(user_id)
@@ -152,7 +152,7 @@ def add_goal(user_id):
         return jsonify({'message': 'Goal added successfully'}), 201
     return jsonify({'error': 'Invalid goal data'}), 400
 
-@app.route('/users/<int:user_id>/goals/<int:goal_index>', methods=['DELETE'])
+@app.route('/<int:user_id>/goals/<int:goal_index>', methods=['DELETE'])
 def delete_goal(user_id, goal_index):
     user = User.query.get_or_404(user_id)
     if goal_index < 0 or goal_index >= len(user.goals):
@@ -166,7 +166,7 @@ def delete_goal(user_id, goal_index):
         "deleted_goal": deleted_goal
     }), 200
 
-@app.route('/users/<int:user_id>/achieved_goals', methods=['POST'])
+@app.route('/<int:user_id>/achieved_goals', methods=['POST'])
 def add_achieved_goal(user_id):
     user = User.query.get_or_404(user_id)
     data = request.get_json()
@@ -178,7 +178,7 @@ def add_achieved_goal(user_id):
     db.session.commit()
     return jsonify({'message': 'Achieved goal added successfully', 'goal': data}), 201
 
-@app.route('/users/<int:user_id>/achieved_goals/<int:goal_index>', methods=['DELETE'])
+@app.route('/<int:user_id>/achieved_goals/<int:goal_index>', methods=['DELETE'])
 def delete_achieved_goal(user_id, goal_index):
     user = User.query.get_or_404(user_id)
     if goal_index < 0 or goal_index >= len(user.achieved_goals):
@@ -192,7 +192,7 @@ def delete_achieved_goal(user_id, goal_index):
         "deleted_goal": deleted_goal
     }), 200
 
-@app.route('/users/<int:user_id>/monthly_report', methods=['POST'])
+@app.route('/<int:user_id>/monthly_report', methods=['POST'])
 def add_monthly_report(user_id):
     user = User.query.get_or_404(user_id)
     data = request.get_json()
@@ -203,10 +203,6 @@ def add_monthly_report(user_id):
     user.monthly_report = monthly_reports
     db.session.commit()
     return jsonify({'message': 'Monthly report added successfully', 'report': data}), 201
-
-@app.route("/")
-def home():
-    return "Hello, Render!"
 
 # Crear las tablas
 with app.app_context():
