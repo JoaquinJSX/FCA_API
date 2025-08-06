@@ -8,7 +8,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Usar variable de entorno para la base de datos
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:ZFypiYieLAuQTPyVKxkUCZfTMOumSoyu@switchyard.proxy.rlwy.net:54569/railway'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://neondb_owner:npg_pdbKwMr4O9NT@ep-divine-bar-adkave4p-pooler.c-2.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
